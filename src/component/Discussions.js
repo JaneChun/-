@@ -1,32 +1,49 @@
-import { useEffect, useState } from "react";
-import Discussion from "./Discussion";
+import Discussion from './Discussion';
+import Form from './Form';
+import Pagenation from './Pagenation';
+import Loading from './Loading';
+import { useFetch } from '../util/useFetch';
+import { useState } from 'react';
 
 export default function Discussions() {
-    const [discussionsData, setDiscussionsData] = useState([]);
+	const [isLoading, setIsLoading] = useState(true);
+	const [data, setData] = useFetch(setIsLoading);
 
-    useEffect(() => {
-        fetch('http://localhost:4000/discussions')
-            .then((res) => res.json())
-            .then((data) => setDiscussionsData(data));
-    }, []);
+	const addDiscussion = (newObj) => {
+		setData([newObj, ...data]);
+		console.log('addDiscussion 함수가 실행되었습니다.');
+	};
 
-    return (
-        <div className="discussion__wrapper">
-            <ul className="discussions__container">
-                {discussionsData.map((d) => (
-                    <Discussion 
-                        answer={d.answer}
-                        author={d.author}
-                        avatarUrl={d.avatarUrl}
-                        bodyHTML={d.bodyHTML}
-                        createdAt={d.createdAt}
-                        key={d.id}
-                        title={d.title}
-                        updatedAt={d.updatedAt}
-                        url={d.url}
-                    />
-                ))}
-            </ul>
-        </div>
-    );
+	return (
+		<div>
+			<Form addDiscussion={addDiscussion} />
+			<Pagenation />
+			{isLoading ? (
+				<Loading />
+			) : (
+				<div className='discussion__wrapper'>
+					<ul className='discussions__container'>
+						{data.map((el) => {
+							const { url, title, id, author, createdAt, updatedAt, bodyHTML, answer } = el.node;
+							return (
+								<Discussion
+									key={id}
+									id={id}
+									answer={answer}
+									author={author.login}
+									avatarUrl={author.avatarUrl}
+									bodyHTML={bodyHTML}
+									createdAt={createdAt}
+									title={title}
+									updatedAt={updatedAt}
+									url={url}
+									// answer는 아직 안받아옴
+								/>
+							);
+						})}
+					</ul>
+				</div>
+			)}
+		</div>
+	);
 }

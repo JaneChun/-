@@ -1,11 +1,9 @@
 import { useState, useEffect } from 'react';
 import { graphql } from '@octokit/graphql';
 
-const GITHUB_TOKEN = process.env.REACT_APP_GITHUB_TOKEN;
-
 export const useFetch = (setIsLoading) => {
 	const [data, setData] = useState([]);
-	console.log('token', GITHUB_TOKEN);
+	const GITHUB_TOKEN = process.env.REACT_APP_GITHUB_TOKEN;
 
 	async function fetch() {
 		const { repository } = await graphql(
